@@ -1,6 +1,3 @@
-import { Router } from 'express';
-
-
 const express = require('express');
 const router = express.Router();
 
@@ -10,14 +7,14 @@ router.get('/', (req, res) => {
 
 
 router.post('/', (req, res) => {
-    const { title, description, price } = req.body;
+    const { title, description, price, machine_type, location } = req.body;
 
-    if (!title || !description || !price) {
+    if (!title || !description || !price || !machine_type || !location) {
         return res.status(400).json({ message: 'Title, description, and price are required.' });
     }
 
     // Here you would typically save the listing to a database
-    res.json({ message: 'Listing created successfully!', listing: { title, description, price } });
+    res.json({ message: 'Listing created successfully!', listing: { title, description, price, machine_type, location } });
 });
 
 
@@ -29,21 +26,21 @@ router.get('/:id', (req, res) => {
     }
 
     // Here you would typically fetch the listing from a database using the listingId
-    res.json({ message: `Listing with ID ${listingId} fetched successfully!`, listing: { id: listingId, title: 'Sample Listing', description: 'This is a sample listing.', price: 100 } });
+    res.json({ message: `Listing with ID ${listingId} fetched successfully!`, listing: { id: listingId, title: 'Sample Listing', description: 'This is a sample listing.', price: 100 , machine_type: 'Sample Machine', location: 'Sample Location'} });
 });
 
-router.post('/:id', (req, res) => {
+router.put('/:id', (req, res) => {
     const listingId = req.params.id;
-    const { title, description, price } = req.body;
+    const { title, description, price, machine_type, location} = req.body;
         if (!listingId) {
         return res.status(400).json({ message: 'Listing ID is required.' });
     }
-        if (!title || !description || !price) {
+        if (!title || !description || !price || !machine_type || !location) {
         return res.status(400).json({ message: 'Title, description, and price are required.' });
     }
 
     // Here you would typically update the listing in a database using the listingId
-    res.json({ message: `Listing with ID ${listingId} updated successfully!`, listing: { id: listingId, title, description, price } });
+    res.json({ message: `Listing with ID ${listingId} updated successfully!`, listing: { id: listingId, title, description, price, machine_type, location } });
 });
 
 router.delete('/:id', (req, res) => {
