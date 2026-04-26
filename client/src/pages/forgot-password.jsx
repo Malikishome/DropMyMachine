@@ -8,14 +8,14 @@ function forgotPassword() {
     if (sent) {
         return (
             <div className="flex items-center justify-center h-screen">
-                <p className="text-2xl text-green-500">Reset link sent to your email!</p>
+                <p className="text-2xl text-green-500">Reset link sent to your email! Please check your inbox.</p>
             </div>
         );
     }
     if (error) {
         return (
             <div className="flex items-center justify-center h-screen">
-                <p className="text-2xl text-red-500">An error occurred. Please try again.</p>
+                <p className="text-2xl text-red-500">An error occurred. Please try again. </p>
             </div>
         );
     }
@@ -24,7 +24,7 @@ function forgotPassword() {
         setEmail(e.target.value);
     };
 
-    
+
     const handleSubmit = (e) => {
         e.preventDefault();
         setSent(true);
