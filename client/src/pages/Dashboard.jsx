@@ -1,10 +1,11 @@
-function Dashboard({ title, description, price, machine_type, location}) {
-    return (
-        <div className="flex items-center justify-center h-screen">
-        <h1 className="text-4xl font-bold">Dashboard Page</h1>
-        {/* Add your dashboard content here */}
-        </div>
-    )
-    }
+import React from 'react';
 
-export default Dashboard;
+function Dashboard() {
+  return (
+    <div className="flex items-center justify-center h-screen">
+      <h1 className="text-4xl font-bold">Dashboard</h1>
+    </div>
+  )
+}
+
+export default Dashboard

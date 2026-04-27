@@ -1,63 +1,56 @@
-import React, { useState } from 'react';
+import { useState } from 'react'
 
 function ForgotPassword() {
-    const [sent, setSent] = useState(false);
-    const [error, setError] = useState(false);
-    const [email, setEmail] = useState('');
+  const [email, setEmail] = useState('')
+  const [sent, setSent] = useState(false)
+  const [error, setError] = useState(false)
 
-    
-    const handleEmailChange = (e) => {
-        setEmail(e.target.value);
-    };
+  const handleEmailChange = (e) => { setEmail(e.target.value) }
 
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    setSent(true)
+  }
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setSent(true);
-        // Handle forgot password logic here (e.g., API call to send reset link)
-        alert('Reset link sent to your email!');
+  if (sent) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-2xl text-green-500">Reset link sent! Check your inbox.</p>
+      </div>
+    )
+  }
 
-        if (sent) {
-          return (
-              <div className="flex items-center justify-center h-screen">
-                  <p className="text-2xl text-green-500">Reset link sent to your email! Please check your inbox.</p>
-              </div>
-          );
-      }
-      if (error) {
-          return (
-              <div className="flex items-center justify-center h-screen">
-                  <p className="text-2xl text-red-500">An error occurred. Please try again. </p>
-              </div>
-          );
-      }
-      
-    };
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-2xl text-red-500">An error occurred. Please try again.</p>
+      </div>
+    )
+  }
 
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="flex items-center justify-center h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 bg-white rounded shadow">
         <h2 className="text-2xl font-bold mb-6 text-center">Forgot Password</h2>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="email" className="block text-gray-700 mb-2">Email Address</label>
             <input
               type="email"
               id="email"
+              value={email}
+              onChange={handleEmailChange}
               className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
               placeholder="Enter your email"
             />
           </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200"
-          >
+          <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
             Send Reset Link
           </button>
         </form>
       </div>
     </div>
-  );
+  )
 }
 
-export default ForgotPassword;
+export default ForgotPassword
