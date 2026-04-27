@@ -1,4 +1,4 @@
-function dashboard() {
+function Dashboard({ title, description, price, machine_type, location}) {
     return (
         <div className="flex items-center justify-center h-screen">
         <h1 className="text-4xl font-bold">Dashboard Page</h1>
@@ -7,4 +7,4 @@ function dashboard() {
     )
     }
 
-export default dashboard;
+export default Dashboard;

@@ -1,24 +1,10 @@
 import React, { useState } from 'react';
 
-function forgotPassword() {
+function ForgotPassword() {
     const [sent, setSent] = useState(false);
     const [error, setError] = useState(false);
     const [email, setEmail] = useState('');
 
-    if (sent) {
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <p className="text-2xl text-green-500">Reset link sent to your email! Please check your inbox.</p>
-            </div>
-        );
-    }
-    if (error) {
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <p className="text-2xl text-red-500">An error occurred. Please try again. </p>
-            </div>
-        );
-    }
     
     const handleEmailChange = (e) => {
         setEmail(e.target.value);
@@ -30,6 +16,22 @@ function forgotPassword() {
         setSent(true);
         // Handle forgot password logic here (e.g., API call to send reset link)
         alert('Reset link sent to your email!');
+
+        if (sent) {
+          return (
+              <div className="flex items-center justify-center h-screen">
+                  <p className="text-2xl text-green-500">Reset link sent to your email! Please check your inbox.</p>
+              </div>
+          );
+      }
+      if (error) {
+          return (
+              <div className="flex items-center justify-center h-screen">
+                  <p className="text-2xl text-red-500">An error occurred. Please try again. </p>
+              </div>
+          );
+      }
+      
     };
 
   return (
@@ -58,4 +60,4 @@ function forgotPassword() {
   );
 }
 
-export default forgotPassword;
+export default ForgotPassword;
