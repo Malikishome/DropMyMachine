@@ -1,12 +1,6 @@
 const supabase = require('../config/db');
-const router = express.Router();
-const express = require('express');
 
-
-
-
-/**
- * const authMiddleware = async (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
@@ -28,5 +22,6 @@ const express = require('express');
     console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
   }
- */
+};
+
 module.exports = authMiddleware;
