@@ -24,6 +24,10 @@ function Login() {
             setError('Email is required');
         }
 
+        if (!success) {
+            setError('Invalid email or password');
+        }
+
         setTimeout(() => {
             setSuccess(true);
             setLoading(false);
@@ -65,7 +69,7 @@ function Login() {
         return <div className="flex items-center justify-center h-screen"><p className="text-2xl">Loading...</p></div>;
     }
     if (success) {
-        return <div className="flex items-center justify-center h-screen"><p className="text-2xl text-green-500">{success}</p></div>;
+        return <div className="flex items-center justify-center h-screen"><p className="text-2xl text-green-500">{Dashboard()}</p></div>;
     }
     if (error) {
         return <div className="flex items-center justify-center h-screen"><p className="text-2xl text-red-500">{error}</p></div>;
