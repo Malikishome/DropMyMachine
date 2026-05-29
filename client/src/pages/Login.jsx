@@ -1,5 +1,6 @@
 import React, {    useState    } from 'react';
 import {    Link ,    useNavigate   } from 'react-router-dom';
+import FloatingInput from '../FloatingInput';
 
 function Login() {
 
@@ -66,7 +67,7 @@ function Login() {
     
 
     if (loading) {
-        return <div className="flex items-center justify-center h-screen"><p className="text-2xl">Loading...</p></div>;
+        return <div className="flex items-center justify-center h-screen animate-pulse infinite"><p className="text-4xl">Loading...</p></div>;
     }
     if (success) {
         return <div className="flex items-center justify-center h-screen"><p className="text-2xl text-green-500">{Dashboard()}</p></div>;
@@ -81,8 +82,9 @@ function Login() {
                 <h2 className="text-2xl font-bold mb-6 text-center">Login to Your Account</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
-                        <label htmlFor="email" className="block text-gray-700 mb-2">Email Address</label>
-                        <input
+                        <FloatingInput
+                            label="Email Address"
+                            name="email"
                             type="email"
                             id="email"
                             className={inputClass}
@@ -92,8 +94,9 @@ function Login() {
                         />
                     </div>
                     <div className="mb-4">
-                        <label htmlFor="password" className="block text-gray-700 mb-2">Password</label>
-                        <input
+                        <FloatingInput
+                            label="Password"
+                            name="password"
                             type="password"
                             id="password"
                             className={inputClass}

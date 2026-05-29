@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import FloatingInput from '../FloatingInput'
 
 function ForgotPassword() {
   const [email, setEmail] = useState('')
@@ -34,14 +35,14 @@ function ForgotPassword() {
         <h2 className="text-2xl font-bold mb-6 text-center">Forgot Password</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-700 mb-2">Email Address</label>
-            <input
+            <FloatingInput
+              label="Enter your Email Address"
+              name="email"
               type="email"
               id="email"
               value={email}
               onChange={handleEmailChange}
               className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
-              placeholder="Enter your email"
             />
           </div>
           <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">

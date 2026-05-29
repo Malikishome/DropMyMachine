@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import FloatingInput from '../FloatingInput';
 
 //Look over the logic of this code again
 function Register() {
@@ -65,10 +66,10 @@ function Register() {
         <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-700 mb-2">Email Address</label>
-            <input
+            <FloatingInput
+              label="Email Address"
+              name="email"
               type="email"
-              id="email"
               value={email}
               onChange={handleEmailChange}
               className={inputClass}
@@ -77,10 +78,10 @@ function Register() {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="password" className="block text-gray-700 mb-2">Password</label>
-            <input
+            <FloatingInput
+              label="Password"
+              name="password"
               type="password"
-              id="password"
               value={password}
               onChange={handlePasswordChange}
               className={inputClass}
@@ -89,8 +90,9 @@ function Register() {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="confirmPassword" className="block text-gray-700 mb-2">Confirm Password</label>
-            <input
+            <FloatingInput
+              label="Confirm Password"
+              name="confirmPassword"
               type="password"
               id="confirmPassword"
               value={confirmPassword}

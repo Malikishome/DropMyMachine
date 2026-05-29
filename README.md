@@ -1,5 +1,5 @@
-# DropMyMachine is a web platform that helps machine owners and businesses connect without cold calling.
-
+# DropMyMachine 
+is a web platform that helps machine owners and businesses connect without cold calling.
 Many owners of machines such as:
 vending machines
 gumball machines

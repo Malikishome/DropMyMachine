@@ -1,23 +1,27 @@
 @import "tailwindcss";
 
 @theme {
-    --animate-shake: shake 1s ease-in-out infinite;
+  --animate-hang: hang 2.5s ease infinite;
 
-    @keyframes shake {
-        0% {
-            transform: translateX(0);
-        }
-        25% {
-            transform: translateX(10px);
-        }
-        50% {
-            transform: translateX(-10px);
-        }
-        75% {
-            transform: translateX(10px);
-        }
-        100% {
-            transform: translateX(0);
-        }
+  @keyframes hang {
+   0% {
+      transform: rotate(-25deg) translateY(0) scaleY(1);
     }
+
+    35% {
+      transform: rotate(0deg) translateY(18px) scaleY(0.85);
+    }
+
+    45% {
+      transform: rotate(8deg) translateY(10px) scaleY(1.05);
+    }
+
+    60% {
+      transform: rotate(-6deg) translateY(4px);
+    }
+
+    100% {
+      transform: rotate(-25deg) translateY(0);
+    }
+  }
 }
