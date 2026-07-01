@@ -1,56 +1,80 @@
 const express = require('express');
 const router = express.Router();
+const supabase = require('../config/db');
 
-router.get('/', (req, res) => {
-    res.json({ message: 'Listings route is working!' });
+router.get('/', async (req, res) => {
+    const { city, machine_type } = req.query;
+    
+    try {
+        let query = supabase.from('listings').select('*');
+        if (city) {
+            query = query.eq('city', city);
+        }
+        if (machine_type) {
+            query = query.eq('machine_type', machine_type);
+        }
+        const { data, error } = await query;
+        if (error) {return res.status(400).json({ message: error.message });}
+        res.json({ listings: data });
+    } catch (error) {
+        console.error('Error fetching listings:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
 });
 
 
-router.post('/', (req, res) => {
-    const { title, description, price, machine_type, location } = req.body;
-
-    if (!title || !description || !price || !machine_type || !location) {
-        return res.status(400).json({ message: 'Title, description, and price are required.' });
+router.post('/', async (req, res) => {
+    const { title, description, city, machine_type, user_id } = req.body;
+    if (!title || !description || !city || !machine_type || !user_id) {
+        return res.status(400).json({ message: 'All fields are required' });
     }
-
-    // Here you would typically save the listing to a database
-    res.json({ message: 'Listing created successfully!', listing: { title, description, price, machine_type, location } });
+    try {
+        const { data, error } = await supabase.from('listings').insert([
+            { title, description, city, machine_type, status: 'pending', user_id }
+        ]);
+        if (error) {return res.status(400).json({ message: error.message });}
+        res.status(201).json({ listing: data[0] });
+    } catch (error) {
+        console.error('Error creating listing:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
 });
 
-
-router.get('/:id', (req, res) => {
-    const listingId = req.params.id;
-
-    if (!listingId) {
-        return res.status(400).json({ message: 'Listing ID is required.' });
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const { data, error } = await supabase.from('listings').select('*').eq('id', id).single();
+        if (error) {return res.status(404).json({ message: 'Listing not found' });}
+        res.json({ listing: data });
+    } catch (error) {
+        console.error('Error fetching listing:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
-
-    // Here you would typically fetch the listing from a database using the listingId
-    res.json({ message: `Listing with ID ${listingId} fetched successfully!`, listing: { id: listingId, title: 'Sample Listing', description: 'This is a sample listing.', price: 100 , machine_type: 'Sample Machine', location: 'Sample Location'} });
 });
 
-router.put('/:id', (req, res) => {
-    const listingId = req.params.id;
-    const { title, description, price, machine_type, location} = req.body;
-        if (!listingId) {
-        return res.status(400).json({ message: 'Listing ID is required.' });
+router.put('/:id', async (req, res) => {
+    const { id } = req.params;
+    const { title, description, city, machine_type, status } = req.body;
+    try {
+        const { data, error } = await supabase.from('listings').update({ title, description, city, machine_type, status }).eq('id', id);
+        if (error) {return res.status(400).json({ message: error.message });}
+        res.json({ listing: data[0] });
+    } catch (error) {
+        console.error('Error updating listing:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
-        if (!title || !description || !price || !machine_type || !location) {
-        return res.status(400).json({ message: 'Title, description, and price are required.' });
-    }
-
-    // Here you would typically update the listing in a database using the listingId
-    res.json({ message: `Listing with ID ${listingId} updated successfully!`, listing: { id: listingId, title, description, price, machine_type, location } });
 });
 
-router.delete('/:id', (req, res) => {
-    const listingId = req.params.id;    
-    if (!listingId) {
-        return res.status(400).json({ message: 'Listing ID is required.' });
+router.delete('/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const { error } = await supabase.from('listings').delete().eq('id', id);
+        if (error) {return res.status(400).json({ message: error.message });}
+        res.json({ message: 'Listing deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting listing:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
-
-    // Here you would typically delete the listing from a database using the listingId
-    res.json({ message: `Listing with ID ${listingId} deleted successfully!` });
 });
 
 module.exports = router;
