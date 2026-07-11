@@ -1,14 +1,14 @@
 # DropMyMachine 
-is a web platform that helps machine owners and businesses connect without cold calling.
-Many owners of machines such as:
-vending machines
-gumball machines
-arcade machines
-kiosks
-often struggle to find good locations. This platform allows businesses to request machines and vendors to easily discover opportunities.
-Key Features
-Business owners can post machine requests
-Vendors can browse available locations
-Shops and hotels can request specific machines
-Easier discovery of placement opportunities
-Removes the need for cold calling businesses
+is a web platform that helps machine owners and businesses connect without cold calling. <br>
+Many owners of machines such as:<br>
+vending machines <br>
+gumball machines <br>
+arcade machines<br>
+kiosks <br>
+often struggle to find good locations. This platform allows businesses to request machines and vendors to easily discover  <br>opportunities. <br>
+Key Features <br>
+Business owners can post machine requests <br>
+Vendors can browse available locations <br>
+Shops and hotels can request specific machines <br>
+Easier discovery of placement opportunities <br>
+Removes the need for cold calling businesses <br>
