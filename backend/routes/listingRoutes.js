@@ -24,16 +24,17 @@ router.get('/', async (req, res) => {
 
 
 router.post('/', async (req, res) => {
-    const { title, description, city, machine_type, user_id } = req.body;
-    if (!title || !description || !city || !machine_type || !user_id) {
+    const { description, city, machine_type, user_id } = req.body;
+    if (!description || !city || !machine_type || !user_id) {
         return res.status(400).json({ message: 'All fields are required' });
     }
     try {
         const { data, error } = await supabase.from('listings').insert([
-            { title, description, city, machine_type, status: 'pending', user_id }
-        ]);
+            { description, city, machine_type, status: 'pending', user_id }
+        ]).select();
         if (error) {return res.status(400).json({ message: error.message });}
-        res.status(201).json({ listing: data[0] });
+        if (!data || data.length === 0) return res.status(201).json({ message: 'Listing created successfully' })
+            res.status(201).json({ listing: data[0] })
     } catch (error) {
         console.error('Error creating listing:', error);
         res.status(500).json({ message: 'Internal server error' });
@@ -54,9 +55,9 @@ router.get('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { title, description, city, machine_type, status } = req.body;
+    const { description, city, machine_type, status } = req.body;
     try {
-        const { data, error } = await supabase.from('listings').update({ title, description, city, machine_type, status }).eq('id', id);
+        const { data, error } = await supabase.from('listings').update({ description, city, machine_type, status }).eq('id', id);
         if (error) {return res.status(400).json({ message: error.message });}
         res.json({ listing: data[0] });
     } catch (error) {
