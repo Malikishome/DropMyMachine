@@ -2,39 +2,52 @@ import React, {    useState    } from 'react';
 import {    Link ,    useNavigate   } from 'react-router-dom';
 import FloatingInput from '../FloatingInput';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 function Login() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [success, setSuccess] = useState(false);
     const navigate = useNavigate();
 
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setEmail('');
-        setPassword('');
-        setLoading(true);
 
-            if (!password) {
-            setError('Password is required');
-        }
         if (!email) {
             setError('Email is required');
+            return;
+        }
+        if (!password) {
+            setError('Password is required');
+            return;
         }
 
-        if (!success) {
-            setError('Invalid email or password');
-        }
+        setLoading(true);
 
-        setTimeout(() => {
-            setSuccess(true);
-            setLoading(false);
-            setError(false);
+        try {
+            const res = await fetch(`${API_URL}/api/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                setLoading(false);
+                setError(data.message || 'Invalid email or password');
+                return;
+            }
+
+            localStorage.setItem('session', JSON.stringify(data.session));
             navigate('/dashboard');
-        }, 1000);
+        } catch (err) {
+            console.error(err);
+            setLoading(false);
+            setError('Unable to reach the server. Please try again.');
+        }
     };
 
     const handleEmailChange = (e) => {
@@ -46,40 +59,29 @@ function Login() {
     };
 
     const handleRegisterRedirect = () => {
-        // Redirect to the registration page
-        useNavigate = '/register';
+        navigate('/register');
     };
 
     const handleForgotPasswordRedirect = () => {
-        // Redirect to the forgot password page
-        useNavigate = '/forgot-password';
+        navigate('/forgot-password');
     };
 
     const handleGoogleLogin = () => {
-        // Redirect to the Google login page
-        useNavigate = '/dashboard';
-        // Handle Google login logic here(authentication, API calls, etc.)
+        // TODO: real Google OAuth login (not part of this fix)
+        navigate('/dashboard');
     };
 
-    const inputClass = "border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500";
     const buttonClass = "bg-blue-500 text-white rounded px-4 py-2 w-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500";
 
     
 
-    if (loading) {
-        return <div className="flex items-center justify-center h-screen animate-pulse infinite"><p className="text-4xl">Loading...</p></div>;
-    }
-    if (success) {
-        return <div className="flex items-center justify-center h-screen"><p className="text-2xl text-green-500">{Dashboard()}</p></div>;
-    }
-    if (error) {
-        return <div className="flex items-center justify-center h-screen"><p className="text-2xl text-red-500">{error}</p></div>;
-    }
-
     return (
-        <section className="flex items-center justify-center h-screen bg-gray-100">
-            <div className="w-full max-w-md p-8 bg-white rounded shadow">
-                <h2 className="text-2xl font-bold mb-6 text-center">Login to Your Account</h2>
+        <section className="flex items-center justify-center h-screen bg-gray-900">
+            <div className="w-full max-w-md p-8 bg-gray-800 rounded shadow">
+                <h2 className="text-2xl font-bold mb-6 text-center text-white">Login to Your Account</h2>
+                {error && (
+                    <p className="text-sm text-red-500 mb-4 text-center">{error}</p>
+                )}
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <FloatingInput
@@ -87,10 +89,10 @@ function Login() {
                             name="email"
                             type="email"
                             id="email"
-                            className={inputClass}
                             placeholder="Enter your email"
                             value={email}
                             onChange={handleEmailChange}
+                            dark
                         />
                     </div>
                     <div className="mb-4">
@@ -99,17 +101,19 @@ function Login() {
                             name="password"
                             type="password"
                             id="password"
-                            className={inputClass}
                             placeholder="Enter your password"
                             value={password}
                             onChange={handlePasswordChange}
+                            dark
                         />
                     </div>
-                    <button type="submit" className={buttonClass}>Login</button>
+                    <button type="submit" className={buttonClass} disabled={loading}>
+                        {loading ? 'Logging in...' : 'Login'}
+                    </button>
                 </form>
                 <div className="mt-4 text-center">
-                    <p className="text-sm text-gray-600">Don't have an account? <Link to="/register" className="text-blue-500 hover:underline">Register</Link></p>
-                    <p className="text-sm text-gray-600 mt-2"><Link to="/forgot-password" className="text-blue-500 hover:underline">Forgot Password?</Link></p>
+                    <p className="text-sm text-gray-400">Don't have an account? <Link to="/register" className="text-blue-500 hover:underline">Register</Link></p>
+                    <p className="text-sm text-gray-400 mt-2"><Link to="/forgot-password" className="text-blue-500 hover:underline">Forgot Password?</Link></p>
                     <button onClick={handleGoogleLogin} className={`${buttonClass} mt-4 bg-red-500 hover:bg-red-600`}>Login with Google</button>
                 </div>
             </div>

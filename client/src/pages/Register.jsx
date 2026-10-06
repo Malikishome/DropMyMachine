@@ -47,23 +47,22 @@ function Register() {
     const handleConfirmPasswordChange = (e) => {
         setConfirmPassword(e.target.value);
     }
-    const inputClass = "border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500";
     const buttonClass = "bg-blue-500 text-white rounded px-4 py-2 w-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500";
 
     if (loading) {
-        return <div className="flex items-center justify-center h-screen"><p className="text-2xl">Loading...</p></div>;
+        return <div className="flex items-center justify-center h-screen bg-gray-900"><p className="text-2xl text-white">Loading...</p></div>;
     }
     if (success) {
-        return <div className="flex items-center justify-center h-screen"><p className="text-2xl text-green-500">{success}</p></div>;
-    }
-    if (error) {
-        return <div className="flex items-center justify-center h-screen"><p className="text-2xl text-red-500">{error}</p></div>;
+        return <div className="flex items-center justify-center h-screen bg-gray-900"><p className="text-2xl text-green-500">{success}</p></div>;
     }
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="w-full max-w-md p-8 bg-white rounded shadow">
-        <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
+    <div className="flex items-center justify-center h-screen bg-gray-900">
+      <div className="w-full max-w-md p-8 bg-gray-800 rounded shadow">
+        <h2 className="text-2xl font-bold mb-6 text-center text-white">Register</h2>
+        {error && (
+          <p className="text-sm text-red-500 mb-4 text-center">{error}</p>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <FloatingInput
@@ -72,9 +71,9 @@ function Register() {
               type="email"
               value={email}
               onChange={handleEmailChange}
-              className={inputClass}
               placeholder="Enter your email"
               required
+              dark
             />
           </div>
           <div className="mb-4">
@@ -84,9 +83,9 @@ function Register() {
               type="password"
               value={password}
               onChange={handlePasswordChange}
-              className={inputClass}
               placeholder="Enter your password"
               required
+              dark
             />
           </div>
           <div className="mb-4">
@@ -97,9 +96,9 @@ function Register() {
               id="confirmPassword"
               value={confirmPassword}
               onChange={handleConfirmPasswordChange}
-              className={inputClass}
               placeholder="Confirm your password"
               required
+              dark
             />
           </div>
             <button
@@ -109,7 +108,7 @@ function Register() {
                 Register
             </button>
         </form>
-        <p className="mt-4 text-center">
+        <p className="mt-4 text-center text-gray-400">
           Already have an account?{' '}
           <Link to="/login" className="text-blue-500 hover:underline">
             Login

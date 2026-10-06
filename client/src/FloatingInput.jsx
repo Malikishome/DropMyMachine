@@ -1,6 +1,6 @@
 import React from "react";
 
-function FloatingInput({ label, type = "text", name, value, onChange }) {
+function FloatingInput({ label, type = "text", name, value, onChange, dark = false }) {
     return (
         <div className="relative z-0 w-full">
             <input type={type}
@@ -8,14 +8,22 @@ function FloatingInput({ label, type = "text", name, value, onChange }) {
                 placeholder=" "
                 value={value}
                 onChange={onChange}
-                className="peer w-full border border-gray-400 px-3 pt-6 pb-2 rounded-md outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-colors duration-200" />
+                className={`peer w-full border px-3 pt-6 pb-2 rounded-md outline-none focus:ring-2 transition-colors duration-200 ${
+                    dark
+                        ? "border-gray-600 bg-gray-800 text-white focus:border-blue-500 focus:ring-blue-500/10"
+                        : "border-gray-400 focus:border-blue-500 focus:ring-blue-500/10"
+                }`} />
 
-                <label 
+                <label
                 htmlFor={name}
-                    className="absolute left-3 top-4 text-gray-500 transition-all duration-200 ease-in-out pointer-events-none
+                    className={`absolute left-3 top-4 transition-all duration-200 ease-in-out pointer-events-none
                     peer-focus:top-[7px] peer-focus:text-[11px] peer-focus:text-blue-500 peer-focus:font-medium
                     peer-[:not(:placeholder-shown)]:top-[7px] peer-[:not(:placeholder-shown)]:text-[11px]
-                    peer-[:not(:placeholder-shown)]:text-gray-500 peer-[:not(:placeholder-shown)]:font-medium"
+                    peer-[:not(:placeholder-shown)]:font-medium ${
+                        dark
+                            ? "text-gray-400 peer-[:not(:placeholder-shown)]:text-gray-400"
+                            : "text-gray-500 peer-[:not(:placeholder-shown)]:text-gray-500"
+                    }`}
 >
                     {label}
                     </label>
