@@ -1,0 +1,52 @@
+/* Theme variables - the durable output of /prototype.
+   Dark, unified look for DropMyMachine. Port this block into the real app's
+   globals.css @theme when the first UI feature is built. */
+
+:root {
+  /* surfaces */
+  --bg: #0b0f14;            /* page background */
+  --surface: #121821;       /* cards, panels, inputs */
+  --surface-raised: #182130; /* hovered/raised surfaces */
+  --border: #232d3a;
+
+  /* text */
+  --text: #e8edf3;          /* primary */
+  --muted: #93a1b3;         /* secondary, labels */
+  --faint: #5b6b80;         /* hints, placeholders */
+
+  /* accent - existing blue-500 */
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-ink: #ffffff;    /* text on accent */
+
+  /* status */
+  --success: #22c55e;
+  --danger: #ef4444;
+  --danger-surface: #2a1416;
+  --pending: #eab308;
+  --pending-surface: #2a2410;
+
+  /* component states */
+  --input-bg: #0e131a;
+  --input-border: var(--border);
+  --input-border-focus: var(--accent);
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+
+  /* type */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* scale */
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+}

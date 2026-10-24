@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../config/db');
 
+const VALID_ROLES = ['operator', 'location_owner'];
+
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -25,6 +27,10 @@ router.post('/login', async (req, res) => {
 
 router.post('/signup', async (req, res) => {
   const { email, password, role, full_name } = req.body;
+
+  if (!VALID_ROLES.includes(role)) {
+    return res.status(400).json({ message: 'Invalid role' });
+  }
 
   try {
     const { data, error } = await supabase.auth.signUp({
