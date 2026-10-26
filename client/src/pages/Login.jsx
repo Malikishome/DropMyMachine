@@ -1,6 +1,7 @@
 import React, {    useState    } from 'react';
 import {    Link ,    useNavigate   } from 'react-router-dom';
 import FloatingInput from '../FloatingInput';
+import { useAuth } from '../context/useAuth.js';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -11,6 +12,7 @@ function Login() {
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { login } = useAuth();
 
 
     const handleSubmit = async (e) => {
@@ -41,7 +43,7 @@ function Login() {
                 return;
             }
 
-            localStorage.setItem('session', JSON.stringify(data.session));
+            login(data.session);
             navigate('/dashboard');
         } catch (err) {
             console.error(err);
