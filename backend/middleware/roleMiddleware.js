@@ -13,3 +13,5 @@ function roleMiddleware(requiredRole) {
     next();
   };
 }
+
+module.exports = roleMiddleware;
