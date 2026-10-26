@@ -25,6 +25,10 @@ function Register() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!email.trim() || !password.trim() || !fullName.trim()) {
+            setError('Please fill out all fields');
+            return;
+        }
         if (password !== confirmPassword) {
             setError('Passwords do not match');
             return;
@@ -157,7 +161,7 @@ function Register() {
             />
           </div>
           <div className="mb-4">
-            <span className="block text-sm text-gray-400 mb-2">I am a...</span>
+            <span className="block text-md text-gray-400 mb-2">I am a...</span>
             <div className="grid grid-cols-2 gap-2">
               {ROLES.map((r) => (
                 <button

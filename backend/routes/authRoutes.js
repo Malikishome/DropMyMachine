@@ -28,6 +28,10 @@ router.post('/login', async (req, res) => {
 router.post('/signup', async (req, res) => {
   const { email, password, role, full_name } = req.body;
 
+  if (!email || !password || !full_name) {
+    return res.status(400).json({ message: 'Email, password, and full name are required' });
+  }
+
   if (!VALID_ROLES.includes(role)) {
     return res.status(400).json({ message: 'Invalid role' });
   }
