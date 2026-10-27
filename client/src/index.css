@@ -32,3 +32,28 @@
   --radius-control: 8px;
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
 }
+
+/* View Transition hook for ListingCards' click-to-expand photo. The name is
+   assigned to exactly one element at a time (see ListingCards.jsx), so the
+   browser morphs the thumbnail into the lightbox photo instead of
+   cross-fading two unrelated boxes. Slower, eased animation reads as a
+   deliberate expand rather than the browser's default snap. */
+::view-transition-group(expanding-photo) {
+  animation-duration: 0.45s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(expanding-photo),
+::view-transition-new(expanding-photo) {
+  animation-duration: 0.45s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  mix-blend-mode: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
