@@ -1,38 +1,87 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth.js';
-import FilterPanel from '../FilterPanel.jsx';
-import ListingCards from '../ListingCards.jsx';
-import ListingCardSkeleton from '../ListingCardSkeleton.jsx';
+import OperatorDashboard from './OperatorDashboard.jsx';
+import HostDashboard from './HostDashboard.jsx';
 
-const SAMPLE_LISTING = {
-  id: 'sample-1',
-  machine_type: 'vending',
-  city: 'Orlando',
-  state: 'FL',
-  description:
-    'Busy hotel lobby, 24/7 access, next to the elevator bank. Great foot traffic from both guests and event bookings.',
-  foot_traffic: 'high',
-  revenue_split: 30,
-  photo_url: null,
-  status: 'active',
-  created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
-};
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user, session, logout } = useAuth();
   const navigate = useNavigate();
-  const [filters, setFilters] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [profileError, setProfileError] = useState(null);
+
+  const fetchProfile = useCallback(async (signal) => {
+    try {
+      const res = await fetch(`${API_URL}/api/profile/me`, {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+        signal,
+      });
+      const data = await res.json();
+      if (signal?.aborted) return;
+      if (!res.ok) {
+        setProfileError(data.message || "Couldn't load your profile");
+        return;
+      }
+      setProfile(data.profile);
+    } catch (err) {
+      if (signal?.aborted) return;
+      console.error(err);
+      setProfileError("Couldn't reach the server. Please try again.");
+    } finally {
+      if (!signal?.aborted) setProfileLoading(false);
+    }
+  }, [session]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    // fetchProfile only sets state after an await, but the lint rule can't see that.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchProfile(controller.signal);
+    return () => controller.abort();
+  }, [fetchProfile]);
+
+  const handleRetry = () => {
+    setProfileLoading(true);
+    setProfileError(null);
+    fetchProfile();
+  };
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
+  if (profileLoading) {
+    return (
+      <div className="min-h-screen bg-gray-900 p-8">
+        <p className="text-gray-400">Loading your dashboard...</p>
+      </div>
+    );
+  }
+
+  if (profileError) {
+    return (
+      <div className="min-h-screen bg-gray-900 p-8">
+        <p className="text-gray-400 mb-4">{profileError}</p>
+        <button
+          onClick={handleRetry}
+          className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-900 p-8">
       <div className="flex items-center justify-between mb-6">
-        <p className="text-gray-400">Logged in as {user?.email}</p>
+        <p className="text-gray-400">
+          Logged in as {profile?.full_name || user?.email}
+        </p>
         <button
           onClick={handleLogout}
           className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -40,18 +89,7 @@ function Dashboard() {
           Log out
         </button>
       </div>
-      <div className="grid grid-cols-[260px_1fr] gap-6 max-w-3xl">
-        <FilterPanel onChange={setFilters} />
-        <pre className="text-xs text-gray-400 bg-gray-800 rounded p-4 overflow-auto h-fit">
-          {JSON.stringify(filters, null, 2)}
-        </pre>
-      </div>
-
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(270px,1fr))] gap-4 max-w-3xl mt-8">
-        <ListingCards {...SAMPLE_LISTING} />
-        <ListingCardSkeleton />
-        <ListingCardSkeleton />
-      </div>
+      {profile?.role === 'operator' ? <OperatorDashboard /> : <HostDashboard />}
     </div>
   )
 }
