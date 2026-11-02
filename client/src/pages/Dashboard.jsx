@@ -1,13 +1,31 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth.js';
+import DashboardLayout from '../components/DashboardLayout.jsx';
 import OperatorDashboard from './OperatorDashboard.jsx';
 import HostDashboard from './HostDashboard.jsx';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+const OPERATOR_NAV = [
+  { label: 'Dashboard', active: true },
+  { label: 'Browse listings', active: false },
+  { label: 'My requests', active: false },
+  { label: 'Messages', active: false },
+  { label: 'Saved', active: false },
+  { label: 'Settings', active: false },
+];
+
+const HOST_NAV = [
+  { label: 'Dashboard', active: true },
+  { label: 'My listings', active: false },
+  { label: 'Requests', active: false },
+  { label: 'Messages', active: false },
+  { label: 'Settings', active: false },
+];
+
 function Dashboard() {
-  const { user, session, logout } = useAuth();
+  const { session, logout } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
@@ -56,19 +74,19 @@ function Dashboard() {
 
   if (profileLoading) {
     return (
-      <div className="min-h-screen bg-gray-900 p-8">
-        <p className="text-gray-400">Loading your dashboard...</p>
+      <div className="min-h-screen bg-bg p-8">
+        <p className="text-muted">Loading your dashboard...</p>
       </div>
     );
   }
 
   if (profileError) {
     return (
-      <div className="min-h-screen bg-gray-900 p-8">
-        <p className="text-gray-400 mb-4">{profileError}</p>
+      <div className="min-h-screen bg-bg p-8">
+        <p className="text-muted mb-4">{profileError}</p>
         <button
           onClick={handleRetry}
-          className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="bg-accent text-accent-ink rounded-control px-4 py-2 hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent"
         >
           Retry
         </button>
@@ -76,21 +94,20 @@ function Dashboard() {
     );
   }
 
+  const isOperator = profile?.role === 'operator';
+
   return (
-    <div className="min-h-screen bg-gray-900 p-8">
-      <div className="flex items-center justify-between mb-6">
-        <p className="text-gray-400">
-          Logged in as {profile?.full_name || user?.email}
-        </p>
-        <button
-          onClick={handleLogout}
-          className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          Log out
-        </button>
-      </div>
-      {profile?.role === 'operator' ? <OperatorDashboard /> : <HostDashboard />}
-    </div>
+    <DashboardLayout
+      navItems={isOperator ? OPERATOR_NAV : HOST_NAV}
+      planLabel={isOperator ? '— of 5 request slots free' : null}
+      onLogout={handleLogout}
+    >
+      {isOperator ? (
+        <OperatorDashboard profile={profile} />
+      ) : (
+        <HostDashboard profile={profile} />
+      )}
+    </DashboardLayout>
   )
 }
 

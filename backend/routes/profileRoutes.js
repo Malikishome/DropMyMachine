@@ -6,7 +6,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 router.get('/me', authMiddleware, async (req, res) => {
     try {
         const { data, error } = await supabase.from('profiles')
-            .select('role, full_name, city, plan')
+            .select('role, full_name, city, plan, trust_level')
             .eq('id', req.user.id)
             .single();
         if (error) {return res.status(404).json({ message: 'Profile not found' });}
