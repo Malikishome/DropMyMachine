@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
     
     try {
         let query = supabase.from('listings')
-            .select('id, user_id, machine_type, location_type, city, description, foot_traffic, revenue_split, status, created_at');
+            .select('id, user_id, machine_type, location_type, city, description, foot_traffic, status, created_at');
         if (city) {
             query = query.eq('city', city);
         }
@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
 router.get('/mine', authMiddleware, async (req, res) => {
     try {
         const { data, error } = await supabase.from('listings')
-            .select('id, user_id, machine_type, location_type, city, address, description, foot_traffic, revenue_split, status, created_at')
+            .select('id, user_id, machine_type, location_type, city, address, description, foot_traffic, status, created_at')
             .eq('user_id', req.user.id);
         if (error) {return res.status(400).json({ message: error.message });}
         res.json({ listings: data });
@@ -39,13 +39,13 @@ router.get('/mine', authMiddleware, async (req, res) => {
 });
 
 router.post('/', authMiddleware, async (req, res) => {
-    const { description, city, machine_type, location_type, address, foot_traffic, revenue_split } = req.body;
+    const { description, city, machine_type, location_type, address, foot_traffic } = req.body;
     if (!description || !city || !machine_type) {
         return res.status(400).json({ message: 'All fields are required' });
     }
     try {
         const { data, error } = await supabase.from('listings').insert([
-            { description, city, machine_type, location_type, address, foot_traffic, revenue_split, status: 'pending', user_id: req.user.id }
+            { description, city, machine_type, location_type, address, foot_traffic, status: 'pending', user_id: req.user.id }
         ]).select();
         if (error) {return res.status(400).json({ message: error.message });}
         if (!data || data.length === 0) return res.status(201).json({ message: 'Listing created successfully' })
@@ -60,7 +60,7 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const { data, error } = await supabase.from('listings')
-            .select('id, user_id, machine_type, location_type, city, description, foot_traffic, revenue_split, status, created_at')
+            .select('id, user_id, machine_type, location_type, city, description, foot_traffic, status, created_at')
             .eq('id', id)
             .single();
         if (error) {return res.status(404).json({ message: 'Listing not found' });}
@@ -84,10 +84,10 @@ router.get('/:id', async (req, res) => {
 
 router.put('/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
-    const { description, city, machine_type, status, location_type, address, foot_traffic, revenue_split } = req.body;
+    const { description, city, machine_type, status, location_type, address, foot_traffic } = req.body;
     try {
         const { data, error } = await supabase.from('listings')
-            .update({ description, city, machine_type, status, location_type, address, foot_traffic, revenue_split })
+            .update({ description, city, machine_type, status, location_type, address, foot_traffic })
             .eq('id', id)
             .eq('user_id', req.user.id)
             .select();

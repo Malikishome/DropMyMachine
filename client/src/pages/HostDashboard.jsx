@@ -117,9 +117,8 @@ function HostDashboard({
                           {capitalize(listing.machine_type)} · {listing.city}
                         </div>
                         <div className="text-xs text-muted">
-                          {listing.revenue_split}% split
                           {listing.foot_traffic
-                            ? ` · ${capitalize(listing.foot_traffic)} traffic`
+                            ? `${capitalize(listing.foot_traffic)} traffic`
                             : ''}
                         </div>
                       </td>

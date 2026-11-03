@@ -56,7 +56,6 @@ function ListingCards({
   state,
   description,
   foot_traffic,
-  revenue_split,
   photo_url,
   status,
   created_at,
@@ -179,9 +178,6 @@ function ListingCards({
               <span className={`w-1.5 h-1.5 rounded-full ${FOOT_TRAFFIC_DOT_CLASS[foot_traffic]}`} />
               {FOOT_TRAFFIC_LABELS[foot_traffic]}
             </div>
-          )}
-          {revenue_split != null && (
-            <div className="font-bold text-text">{revenue_split}% split</div>
           )}
         </div>
       </div>
