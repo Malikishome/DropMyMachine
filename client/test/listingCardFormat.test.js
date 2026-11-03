@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatPostedDate } from './ListingCards.jsx';
+import { formatPostedDate } from '../src/listingCardFormat.js';
 
 function daysAgo(days) {
   return new Date(Date.now() - days * 86400000).toISOString();
