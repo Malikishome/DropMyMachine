@@ -22,7 +22,12 @@ const authMiddleware = async (req, res, next) => {
       .eq('id', user.id)
       .single();
 
-    if (profileError || !profile) {
+    if (profileError && profileError.code !== 'PGRST116') {
+      console.error(profileError);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+
+    if (!profile) {
       return res.status(401).json({ message: 'Invalid token' });
     }
 

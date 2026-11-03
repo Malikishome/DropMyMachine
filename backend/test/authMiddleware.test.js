@@ -51,7 +51,7 @@ test('authMiddleware attaches the profile role to req.user', async () => {
 test('authMiddleware returns 401 when the profile row is missing', async () => {
   const authMiddleware = loadWithSupabase({
     getUser: validUser,
-    profile: { data: null, error: { message: 'no rows' } },
+    profile: { data: null, error: { code: 'PGRST116', message: 'no rows' } },
   });
   const req = { headers: { authorization: 'Bearer tok' } };
   const res = mockRes();
@@ -61,6 +61,24 @@ test('authMiddleware returns 401 when the profile row is missing', async () => {
 
   assert.equal(called, false);
   assert.equal(res.statusCode, 401);
+  assert.equal(req.user, undefined);
+});
+
+test('authMiddleware returns 500 when the profile lookup fails for another reason', async (t) => {
+  t.mock.method(console, 'error', () => {});
+  const authMiddleware = loadWithSupabase({
+    getUser: validUser,
+    profile: { data: null, error: { code: '08006', message: 'connection failure' } },
+  });
+  const req = { headers: { authorization: 'Bearer tok' } };
+  const res = mockRes();
+  let called = false;
+
+  await authMiddleware(req, res, () => { called = true; });
+
+  assert.equal(called, false);
+  assert.equal(res.statusCode, 500);
+  assert.equal(res.body.message, 'Internal server error');
   assert.equal(req.user, undefined);
 });
 
