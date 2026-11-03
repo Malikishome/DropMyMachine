@@ -16,7 +16,17 @@ const authMiddleware = async (req, res, next) => {
       return res.status(401).json({ message: 'Invalid token' });
     }
 
-    req.user = user;
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || !profile) {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+
+    req.user = { ...user, role: profile.role };
     next();
   } catch (error) {
     console.error(error);
