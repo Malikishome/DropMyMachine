@@ -25,6 +25,19 @@ router.get('/', async (req, res) => {
 });
 
 
+router.get('/mine', authMiddleware, async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('listings')
+            .select('id, user_id, machine_type, location_type, city, address, description, foot_traffic, revenue_split, status, created_at')
+            .eq('user_id', req.user.id);
+        if (error) {return res.status(400).json({ message: error.message });}
+        res.json({ listings: data });
+    } catch (error) {
+        console.error('Error fetching my listings:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 router.post('/', authMiddleware, async (req, res) => {
     const { description, city, machine_type, location_type, address, foot_traffic, revenue_split } = req.body;
     if (!description || !city || !machine_type) {

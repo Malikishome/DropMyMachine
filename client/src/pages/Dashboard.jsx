@@ -67,6 +67,47 @@ function Dashboard() {
     fetchProfile();
   };
 
+  const [myListings, setMyListings] = useState(null);
+  const [myListingsLoading, setMyListingsLoading] = useState(true);
+  const [myListingsError, setMyListingsError] = useState(null);
+
+  const fetchMyListings = useCallback(async (signal) => {
+    try {
+      const res = await fetch(`${API_URL}/api/listings/mine`, {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+        signal,
+      });
+      const data = await res.json();
+      if (signal?.aborted) return;
+      if (!res.ok) {
+        setMyListingsError(data.message || "Couldn't load your listings");
+        return;
+      }
+      setMyListings(data.listings || []);
+    } catch (err) {
+      if (signal?.aborted) return;
+      console.error(err);
+      setMyListingsError("Couldn't reach the server. Please try again.");
+    } finally {
+      if (!signal?.aborted) setMyListingsLoading(false);
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (!profile || profile.role === 'operator') return undefined;
+    const controller = new AbortController();
+    // fetchMyListings only sets state after an await, but the lint rule can't see that.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchMyListings(controller.signal);
+    return () => controller.abort();
+  }, [profile, fetchMyListings]);
+
+  const handleMyListingsRetry = () => {
+    setMyListingsLoading(true);
+    setMyListingsError(null);
+    fetchMyListings();
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -95,17 +136,27 @@ function Dashboard() {
   }
 
   const isOperator = profile?.role === 'operator';
+  const hostPlanLabel =
+    myListingsLoading || myListingsError
+      ? '— of 1 listing in use'
+      : `${myListings.length} of 1 listing in use`;
 
   return (
     <DashboardLayout
       navItems={isOperator ? OPERATOR_NAV : HOST_NAV}
-      planLabel={isOperator ? '— of 5 request slots free' : null}
+      planLabel={isOperator ? '— of 5 request slots free' : hostPlanLabel}
       onLogout={handleLogout}
     >
       {isOperator ? (
         <OperatorDashboard profile={profile} />
       ) : (
-        <HostDashboard profile={profile} />
+        <HostDashboard
+          profile={profile}
+          myListings={myListings}
+          myListingsLoading={myListingsLoading}
+          myListingsError={myListingsError}
+          onMyListingsRetry={handleMyListingsRetry}
+        />
       )}
     </DashboardLayout>
   )
