@@ -49,7 +49,7 @@ function PhotoPlaceholder({ className = '' }) {
   );
 }
 
-function formatPostedDate(createdAt) {
+export function formatPostedDate(createdAt) {
   if (!createdAt) return null;
   const created = new Date(createdAt);
   if (Number.isNaN(created.getTime())) return null;
