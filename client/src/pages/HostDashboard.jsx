@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import ListingFormModal from '../components/ListingFormModal.jsx';
+
 function StatCard({ label, value, caption }) {
   return (
     <div className="rounded-card border border-border bg-surface p-4">
@@ -20,7 +23,13 @@ function HostDashboard({
   myListingsLoading,
   myListingsError,
   onMyListingsRetry,
+  onCreateListing,
+  onUpdateListing,
 }) {
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingListing, setEditingListing] = useState(null);
+  const [togglingId, setTogglingId] = useState(null);
+  const [actionError, setActionError] = useState(null);
   const firstName = profile?.full_name?.split(' ')[0] || 'there';
   const activeCount = myListings
     ? myListings.filter((listing) => listing.status === 'active').length
@@ -31,6 +40,20 @@ function HostDashboard({
     ? 'Manage your listings'
     : `${activeCount} active listing${activeCount === 1 ? '' : 's'}`;
 
+  const togglePause = async (listing) => {
+    setActionError(null);
+    setTogglingId(listing.id);
+    try {
+      await onUpdateListing(listing.id, {
+        status: listing.status === 'paused' ? 'active' : 'paused',
+      });
+    } catch (err) {
+      setActionError(err.message);
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
   return (
     <div>
       <div className="flex items-start justify-between">
@@ -40,9 +63,8 @@ function HostDashboard({
         </div>
         <button
           type="button"
-          disabled
-          aria-disabled="true"
-          className="bg-accent text-accent-ink rounded-control px-4 py-2 text-sm font-semibold opacity-55 cursor-default select-none"
+          onClick={() => setShowCreateForm(true)}
+          className="bg-accent text-accent-ink rounded-control px-4 py-2 text-sm font-semibold hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent"
         >
           + New listing
         </button>
@@ -69,6 +91,15 @@ function HostDashboard({
 
       <div className="mt-6">
         <h2 className="text-sm font-bold text-text mb-3">Your listings</h2>
+
+        {actionError && (
+          <p
+            role="alert"
+            className="mb-3 rounded-control border border-danger/30 bg-danger-surface px-3 py-2 text-sm text-danger"
+          >
+            {actionError}
+          </p>
+        )}
 
         {myListingsLoading && (
           <div className="rounded-card border border-border bg-surface p-6">
@@ -110,6 +141,8 @@ function HostDashboard({
               <tbody>
                 {myListings.map((listing) => {
                   const isActive = listing.status === 'active';
+                  const isPaused = listing.status === 'paused';
+                  const canToggle = isActive || isPaused;
                   return (
                     <tr key={listing.id} className="border-t border-border">
                       <td className="px-4 py-3">
@@ -130,24 +163,29 @@ function HostDashboard({
                               : 'bg-surface-raised text-faint'
                           }`}
                         >
-                          {isActive ? 'Active' : 'Filled'}
+                          {isActive ? 'Active' : isPaused ? 'Paused' : 'Filled'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm text-muted">—</td>
                       <td className="px-4 py-3 text-sm text-muted">—</td>
                       <td className="px-4 py-3">
-                        <span
-                          className="text-xs text-faint select-none cursor-default mr-3"
-                          aria-disabled="true"
+                        <button
+                          type="button"
+                          onClick={() => setEditingListing(listing)}
+                          className="text-xs text-accent hover:text-accent-hover focus:outline-none focus:ring-2 focus:ring-accent rounded-control mr-3"
                         >
                           Edit
-                        </span>
-                        <span
-                          className="text-xs text-faint select-none cursor-default"
-                          aria-disabled="true"
-                        >
-                          Pause
-                        </span>
+                        </button>
+                        {canToggle && (
+                          <button
+                            type="button"
+                            onClick={() => togglePause(listing)}
+                            disabled={togglingId === listing.id}
+                            className="text-xs text-accent hover:text-accent-hover focus:outline-none focus:ring-2 focus:ring-accent rounded-control disabled:opacity-55"
+                          >
+                            {isPaused ? 'Resume' : 'Pause'}
+                          </button>
+                        )}
                       </td>
                     </tr>
                   );
@@ -157,6 +195,27 @@ function HostDashboard({
           </div>
         )}
       </div>
+
+      {showCreateForm && (
+        <ListingFormModal
+          onClose={() => setShowCreateForm(false)}
+          onSubmit={async (payload) => {
+            await onCreateListing(payload);
+            setShowCreateForm(false);
+          }}
+        />
+      )}
+
+      {editingListing && (
+        <ListingFormModal
+          listing={editingListing}
+          onClose={() => setEditingListing(null)}
+          onSubmit={async (payload) => {
+            await onUpdateListing(editingListing.id, payload);
+            setEditingListing(null);
+          }}
+        />
+      )}
     </div>
   );
 }

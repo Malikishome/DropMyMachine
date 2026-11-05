@@ -108,6 +108,33 @@ function Dashboard() {
     fetchMyListings();
   };
 
+  const saveListing = async (method, path, payload) => {
+    let res;
+    try {
+      res = await fetch(`${API_URL}/api/listings${path}`, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      console.error(err);
+      throw new Error("Couldn't reach the server. Please try again.", { cause: err });
+    }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const error = new Error(data.message || "Couldn't save the listing");
+      error.fieldErrors = data.errors;
+      throw error;
+    }
+    await fetchMyListings();
+  };
+
+  const handleCreateListing = (payload) => saveListing('POST', '', payload);
+  const handleUpdateListing = (id, payload) => saveListing('PUT', `/${id}`, payload);
+
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -156,6 +183,8 @@ function Dashboard() {
           myListingsLoading={myListingsLoading}
           myListingsError={myListingsError}
           onMyListingsRetry={handleMyListingsRetry}
+          onCreateListing={handleCreateListing}
+          onUpdateListing={handleUpdateListing}
         />
       )}
     </DashboardLayout>

@@ -1,17 +1,5 @@
 import { useEffect, useState } from 'react';
-
-const MACHINE_TYPES = [
-  { value: 'vending', label: 'Vending' },
-  { value: 'atm', label: 'ATM' },
-  { value: 'arcade', label: 'Arcade' },
-  { value: 'ice', label: 'Ice / Water' },
-];
-
-const FOOT_TRAFFIC_OPTIONS = [
-  { value: 'high', label: 'High' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'low', label: 'Low' },
-];
+import { FOOT_TRAFFIC_OPTIONS, MACHINE_TYPES } from './listingOptions.js';
 
 const pillClass = (selected) =>
   `text-xs font-medium px-3 py-1.5 rounded-full border transition-colors duration-150 ${

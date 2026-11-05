@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../config/db');
 const authMiddleware = require('../middleware/authMiddleware');
+const roleMiddleware = require('../middleware/roleMiddleware');
+const { validateListing } = require('../utils/listingValidation');
 
 router.get('/', async (req, res) => {
     const { city, machine_type } = req.query;
@@ -38,14 +40,14 @@ router.get('/mine', authMiddleware, async (req, res) => {
     }
 });
 
-router.post('/', authMiddleware, async (req, res) => {
-    const { description, city, machine_type, location_type, address, foot_traffic } = req.body;
-    if (!description || !city || !machine_type) {
-        return res.status(400).json({ message: 'All fields are required' });
+router.post('/', authMiddleware, roleMiddleware('location_owner'), async (req, res) => {
+    const { errors, values } = validateListing(req.body);
+    if (Object.keys(errors).length > 0) {
+        return res.status(400).json({ message: 'Invalid listing', errors });
     }
     try {
         const { data, error } = await supabase.from('listings').insert([
-            { description, city, machine_type, location_type, address, foot_traffic, status: 'pending', user_id: req.user.id }
+            { ...values, status: 'active', user_id: req.user.id }
         ]).select();
         if (error) {return res.status(400).json({ message: error.message });}
         if (!data || data.length === 0) return res.status(201).json({ message: 'Listing created successfully' })
@@ -82,12 +84,15 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', authMiddleware, roleMiddleware('location_owner'), async (req, res) => {
     const { id } = req.params;
-    const { description, city, machine_type, status, location_type, address, foot_traffic } = req.body;
+    const { errors, values } = validateListing(req.body, { partial: true });
+    if (Object.keys(errors).length > 0) {
+        return res.status(400).json({ message: 'Invalid listing', errors });
+    }
     try {
         const { data, error } = await supabase.from('listings')
-            .update({ description, city, machine_type, status, location_type, address, foot_traffic })
+            .update(values)
             .eq('id', id)
             .eq('user_id', req.user.id)
             .select();
