@@ -8,7 +8,7 @@ const pillClass = (selected) =>
       : 'bg-input-bg border-border text-muted hover:border-accent'
   }`;
 
-function FilterPanel({ onChange, counts = {} }) {
+function FilterPanel({ onChange, counts = {}, showRadius = true }) {
   const [machineTypes, setMachineTypes] = useState([]);
   const [radiusMiles, setRadiusMiles] = useState(25);
   const [footTraffic, setFootTraffic] = useState(null);
@@ -54,20 +54,22 @@ function FilterPanel({ onChange, counts = {} }) {
         ))}
       </div>
 
-      <div className="mb-6">
-        <label className="block text-xs font-semibold uppercase tracking-wide text-muted mb-2.5">
-          Radius - {radiusMiles} mi (free cap)
-        </label>
-        <input
-          type="range"
-          min={5}
-          max={25}
-          step={5}
-          value={radiusMiles}
-          onChange={(e) => setRadiusMiles(Number(e.target.value))}
-          className="w-full accent-accent"
-        />
-      </div>
+      {showRadius && (
+        <div className="mb-6">
+          <label className="block text-xs font-semibold uppercase tracking-wide text-muted mb-2.5">
+            Radius - {radiusMiles} mi (free cap)
+          </label>
+          <input
+            type="range"
+            min={5}
+            max={25}
+            step={5}
+            value={radiusMiles}
+            onChange={(e) => setRadiusMiles(Number(e.target.value))}
+            className="w-full accent-accent"
+          />
+        </div>
+      )}
 
       <div className="mb-6 last:mb-0">
         <label className="block text-xs font-semibold uppercase tracking-wide text-muted mb-2.5">

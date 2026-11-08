@@ -193,7 +193,7 @@ function ListingCards({
         <button
           type="button"
           disabled={!isActive}
-          className="text-xs font-semibold px-3 py-1.5 rounded-control bg-accent text-accent-ink disabled:opacity-55 disabled:cursor-not-allowed"
+          className="text-xs font-semibold px-3 py-1.5 rounded-control bg-accent text-accent-ink disabled:opacity-55 disabled:cursor-not-allowed cursor-pointer"
         >
           Send Request
         </button>

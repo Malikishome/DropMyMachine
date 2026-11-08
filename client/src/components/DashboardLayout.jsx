@@ -1,9 +1,21 @@
-function NavItem({ label, active }) {
-  if (active) {
+import { NavLink } from 'react-router-dom';
+
+function NavItem({ label, to }) {
+  if (to) {
     return (
-      <span className="block rounded-control bg-accent px-3 py-2 text-sm font-semibold text-accent-ink">
+      <NavLink
+        to={to}
+        end
+        className={({ isActive }) =>
+          `block rounded-control px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent ${
+            isActive
+              ? 'bg-accent font-semibold text-accent-ink'
+              : 'text-muted hover:text-text'
+          }`
+        }
+      >
         {label}
-      </span>
+      </NavLink>
     );
   }
 
@@ -29,7 +41,7 @@ function DashboardLayout({ navItems, planLabel, onLogout, children }) {
 
         <nav className="flex-1 p-3 flex flex-col gap-1">
           {navItems.map((item) => (
-            <NavItem key={item.label} label={item.label} active={item.active} />
+            <NavItem key={item.label} label={item.label} to={item.to} />
           ))}
         </nav>
 

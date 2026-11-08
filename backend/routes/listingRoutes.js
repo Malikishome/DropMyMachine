@@ -4,18 +4,23 @@ const supabase = require('../config/db');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
 const { validateListing } = require('../utils/listingValidation');
+const { parseListingQuery, escapeLike } = require('../utils/listingQuery');
 
 router.get('/', async (req, res) => {
-    const { city, machine_type } = req.query;
-    
+    const { machineTypes, footTraffic, city } = parseListingQuery(req.query);
+
     try {
         let query = supabase.from('listings')
-            .select('id, user_id, machine_type, location_type, city, description, foot_traffic, status, created_at');
+            .select('id, user_id, machine_type, location_type, city, description, foot_traffic, status, created_at')
+            .neq('status', 'paused');
         if (city) {
-            query = query.eq('city', city);
+            query = query.ilike('city', `%${escapeLike(city)}%`);
         }
-        if (machine_type) {
-            query = query.eq('machine_type', machine_type);
+        if (machineTypes.length > 0) {
+            query = query.in('machine_type', machineTypes);
+        }
+        if (footTraffic) {
+            query = query.eq('foot_traffic', footTraffic);
         }
         const { data, error } = await query;
         if (error) {return res.status(400).json({ message: error.message });}

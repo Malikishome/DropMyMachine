@@ -1,27 +1,25 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth.js';
 import DashboardLayout from '../components/DashboardLayout.jsx';
-import OperatorDashboard from './OperatorDashboard.jsx';
-import HostDashboard from './HostDashboard.jsx';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const OPERATOR_NAV = [
-  { label: 'Dashboard', active: true },
-  { label: 'Browse listings', active: false },
-  { label: 'My requests', active: false },
-  { label: 'Messages', active: false },
-  { label: 'Saved', active: false },
-  { label: 'Settings', active: false },
+  { label: 'Dashboard', to: '/dashboard' },
+  { label: 'Browse listings', to: '/dashboard/browse' },
+  { label: 'My requests' },
+  { label: 'Messages' },
+  { label: 'Saved' },
+  { label: 'Settings' },
 ];
 
 const HOST_NAV = [
-  { label: 'Dashboard', active: true },
-  { label: 'My listings', active: false },
-  { label: 'Requests', active: false },
-  { label: 'Messages', active: false },
-  { label: 'Settings', active: false },
+  { label: 'Dashboard', to: '/dashboard' },
+  { label: 'My listings' },
+  { label: 'Requests' },
+  { label: 'Messages' },
+  { label: 'Settings' },
 ];
 
 function Dashboard() {
@@ -174,19 +172,17 @@ function Dashboard() {
       planLabel={isOperator ? '— of 5 request slots free' : hostPlanLabel}
       onLogout={handleLogout}
     >
-      {isOperator ? (
-        <OperatorDashboard profile={profile} />
-      ) : (
-        <HostDashboard
-          profile={profile}
-          myListings={myListings}
-          myListingsLoading={myListingsLoading}
-          myListingsError={myListingsError}
-          onMyListingsRetry={handleMyListingsRetry}
-          onCreateListing={handleCreateListing}
-          onUpdateListing={handleUpdateListing}
-        />
-      )}
+      <Outlet
+        context={{
+          profile,
+          myListings,
+          myListingsLoading,
+          myListingsError,
+          onMyListingsRetry: handleMyListingsRetry,
+          onCreateListing: handleCreateListing,
+          onUpdateListing: handleUpdateListing,
+        }}
+      />
     </DashboardLayout>
   )
 }

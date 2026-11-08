@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import ListingCards from '../ListingCards.jsx';
 import ListingCardSkeleton from '../ListingCardSkeleton.jsx';
 
@@ -90,9 +91,12 @@ function OperatorDashboard({ profile }) {
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-bold text-text">New matches for you</h2>
           {listings && listings.length > PREVIEW_COUNT && (
-            <span className="text-xs text-faint select-none cursor-default">
+            <Link
+              to="/dashboard/browse"
+              className="text-xs font-semibold text-accent hover:text-accent-hover focus:outline-none focus:ring-2 focus:ring-accent rounded-control"
+            >
               See all {listings.length}
-            </span>
+            </Link>
           )}
         </div>
 
