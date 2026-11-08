@@ -49,9 +49,25 @@ function DashboardLayout({ navItems, planLabel, onLogout, children }) {
           <button
             type="button"
             onClick={onLogout}
-            className="text-left text-sm text-muted hover:text-text focus:outline-none focus:ring-2 focus:ring-accent rounded-control px-3 py-1.5"
+            className="group flex w-full items-center gap-3 rounded-card border border-danger/25 bg-danger-surface px-3 py-2.5 text-left text-sm text-muted transition-colors hover:border-danger/50 focus:outline-none focus:ring-2 focus:ring-accent"
           >
-            Log out
+            <span className="flex-1 group-hover:text-text">Log out</span>
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-danger-surface text-accent-ink">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+                aria-hidden="true"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <path d="m16 17 5-5-5-5" />
+                <path d="M21 12H9" />
+              </svg>
+            </span>
           </button>
 
           {planLabel && (
