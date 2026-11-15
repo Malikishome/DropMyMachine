@@ -1,12 +1,18 @@
-export function formatPostedDate(createdAt) {
-  if (!createdAt) return null;
-  const created = new Date(createdAt);
-  if (Number.isNaN(created.getTime())) return null;
+export function formatRelativeDate(isoDate) {
+  if (!isoDate) return null;
+  const date = new Date(isoDate);
+  if (Number.isNaN(date.getTime())) return null;
 
-  const diffDays = Math.floor((Date.now() - created.getTime()) / 86400000);
-  if (diffDays <= 0) return 'Posted today';
-  if (diffDays === 1) return 'Posted 1d ago';
-  if (diffDays < 7) return `Posted ${diffDays}d ago`;
+  const diffDays = Math.floor((Date.now() - date.getTime()) / 86400000);
+  if (diffDays <= 0) return 'Today';
+  if (diffDays === 1) return '1d ago';
+  if (diffDays < 7) return `${diffDays}d ago`;
   const diffWeeks = Math.floor(diffDays / 7);
-  return diffWeeks === 1 ? 'Posted 1 week ago' : `Posted ${diffWeeks} weeks ago`;
+  return diffWeeks === 1 ? '1 week ago' : `${diffWeeks} weeks ago`;
+}
+
+export function formatPostedDate(createdAt) {
+  const relative = formatRelativeDate(createdAt);
+  if (relative === null) return null;
+  return relative === 'Today' ? 'Posted today' : `Posted ${relative}`;
 }

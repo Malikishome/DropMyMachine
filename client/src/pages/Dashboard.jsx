@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth.js';
 import DashboardLayout from '../components/DashboardLayout.jsx';
+import SendRequestModal from '../components/SendRequestModal.jsx';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -133,6 +134,74 @@ function Dashboard() {
   const handleCreateListing = (payload) => saveListing('POST', '', payload);
   const handleUpdateListing = (id, payload) => saveListing('PUT', `/${id}`, payload);
 
+  const [myRequests, setMyRequests] = useState(null);
+  const [myRequestsLoading, setMyRequestsLoading] = useState(true);
+  const [myRequestsError, setMyRequestsError] = useState(null);
+  const [requestingListing, setRequestingListing] = useState(null);
+
+  const fetchMyRequests = useCallback(async (signal) => {
+    try {
+      const res = await fetch(`${API_URL}/api/requests`, {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+        signal,
+      });
+      const data = await res.json();
+      if (signal?.aborted) return;
+      if (!res.ok) {
+        setMyRequestsError(data.message || "Couldn't load your requests");
+        return;
+      }
+      setMyRequests(data.requests || []);
+    } catch (err) {
+      if (signal?.aborted) return;
+      console.error(err);
+      setMyRequestsError("Couldn't reach the server. Please try again.");
+    } finally {
+      if (!signal?.aborted) setMyRequestsLoading(false);
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (profile?.role !== 'operator') return undefined;
+    const controller = new AbortController();
+    // fetchMyRequests only sets state after an await, but the lint rule can't see that.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchMyRequests(controller.signal);
+    return () => controller.abort();
+  }, [profile, fetchMyRequests]);
+
+  const handleMyRequestsRetry = () => {
+    setMyRequestsLoading(true);
+    setMyRequestsError(null);
+    fetchMyRequests();
+  };
+
+  const handleSubmitRequest = async ({ message }) => {
+    let res;
+    try {
+      res = await fetch(`${API_URL}/api/requests`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({ listing_id: requestingListing.id, message }),
+      });
+    } catch (err) {
+      console.error(err);
+      throw new Error("Couldn't reach the server. Please try again.", { cause: err });
+    }
+    const data = await res.json().catch(() => ({}));
+    // 409 means a request already exists, so the card should read as sent either way.
+    if (!res.ok && res.status !== 409) {
+      const error = new Error(data.message || "Couldn't send your request");
+      error.fieldErrors = data.errors;
+      throw error;
+    }
+    setRequestingListing(null);
+    await fetchMyRequests();
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -181,8 +250,20 @@ function Dashboard() {
           onMyListingsRetry: handleMyListingsRetry,
           onCreateListing: handleCreateListing,
           onUpdateListing: handleUpdateListing,
+          myRequests,
+          myRequestsLoading,
+          myRequestsError,
+          onMyRequestsRetry: handleMyRequestsRetry,
+          onSendRequest: setRequestingListing,
         }}
       />
+      {requestingListing && (
+        <SendRequestModal
+          listing={requestingListing}
+          onSubmit={handleSubmitRequest}
+          onClose={() => setRequestingListing(null)}
+        />
+      )}
     </DashboardLayout>
   )
 }

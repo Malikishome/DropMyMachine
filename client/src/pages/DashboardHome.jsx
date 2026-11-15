@@ -3,10 +3,27 @@ import OperatorDashboard from './OperatorDashboard.jsx';
 import HostDashboard from './HostDashboard.jsx';
 
 function DashboardHome() {
-  const { profile, ...hostProps } = useOutletContext();
+  const {
+    profile,
+    myRequests,
+    myRequestsLoading,
+    myRequestsError,
+    onMyRequestsRetry,
+    onSendRequest,
+    ...hostProps
+  } = useOutletContext();
 
   if (profile?.role === 'operator') {
-    return <OperatorDashboard profile={profile} />;
+    return (
+      <OperatorDashboard
+        profile={profile}
+        myRequests={myRequests}
+        myRequestsLoading={myRequestsLoading}
+        myRequestsError={myRequestsError}
+        onMyRequestsRetry={onMyRequestsRetry}
+        onSendRequest={onSendRequest}
+      />
+    );
   }
 
   return <HostDashboard profile={profile} {...hostProps} />;

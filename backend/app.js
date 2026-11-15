@@ -3,6 +3,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const listingRoutes = require('./routes/listingRoutes');
 const profileRoutes = require('./routes/profileRoutes');
+const requestRoutes = require('./routes/requestRoutes');
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/listings', listingRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/requests', requestRoutes);
 
 app.get('/', (req, res) => {
   res.send('Welcome to the DropMyMachine API!');

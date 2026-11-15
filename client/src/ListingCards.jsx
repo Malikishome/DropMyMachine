@@ -60,10 +60,13 @@ function ListingCards({
   status,
   created_at,
   isPriority = false,
+  requested = false,
+  onSendRequest,
 }) {
   const locationBlur = [city, state].filter(Boolean).join(', ');
   const postedLabel = formatPostedDate(created_at);
   const isActive = status === 'active';
+  const canRequest = isActive && !requested && Boolean(onSendRequest);
 
   const [lightboxHidden, setLightboxHidden] = useState(true);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -192,10 +195,15 @@ function ListingCards({
         </span>
         <button
           type="button"
-          disabled={!isActive}
-          className="text-xs font-semibold px-3 py-1.5 rounded-control bg-accent text-accent-ink disabled:opacity-55 disabled:cursor-not-allowed cursor-pointer"
+          disabled={!canRequest}
+          onClick={onSendRequest}
+          className={`text-xs font-semibold px-3 py-1.5 rounded-control disabled:cursor-not-allowed cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent ${
+            requested
+              ? 'bg-success/10 text-success'
+              : 'bg-accent text-accent-ink hover:bg-accent-hover disabled:opacity-55'
+          }`}
         >
-          Send Request
+          {requested ? 'Request Sent!' : 'Send Request'}
         </button>
       </div>
 

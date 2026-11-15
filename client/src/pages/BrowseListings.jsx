@@ -5,13 +5,14 @@ import ListingCards from '../ListingCards.jsx';
 import ListingCardSkeleton from '../ListingCardSkeleton.jsx';
 import { buildListingsQuery } from '../browseQuery.js';
 import { SORT_OPTIONS, sortListings } from '../browseSort.js';
+import { requestsByListing } from '../requestStatus.js';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 const GRID_CLASS = 'grid grid-cols-[repeat(auto-fill,minmax(270px,1fr))] gap-4';
 const SEARCH_DEBOUNCE_MS = 300;
 
 function BrowseListings() {
-  const { profile } = useOutletContext();
+  const { profile, myRequests, onSendRequest } = useOutletContext();
   const isOperator = profile?.role === 'operator';
 
   const [filters, setFilters] = useState({ machineTypes: [], footTraffic: null });
@@ -64,6 +65,7 @@ function BrowseListings() {
     () => sortListings(result?.listings ?? [], sortKey),
     [result, sortKey]
   );
+  const requested = useMemo(() => requestsByListing(myRequests ?? []), [myRequests]);
 
   if (!isOperator) {
     return <Navigate to="/dashboard" replace />;
@@ -161,7 +163,12 @@ function BrowseListings() {
           {showResults && sorted.length > 0 && (
             <div className={GRID_CLASS}>
               {sorted.map((listing) => (
-                <ListingCards key={listing.id} {...listing} />
+                <ListingCards
+                  key={listing.id}
+                  {...listing}
+                  requested={requested.has(listing.id)}
+                  onSendRequest={() => onSendRequest(listing)}
+                />
               ))}
             </div>
           )}

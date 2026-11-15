@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatPostedDate } from '../src/listingCardFormat.js';
+import { formatPostedDate, formatRelativeDate } from '../src/listingCardFormat.js';
 
 function daysAgo(days) {
   return new Date(Date.now() - days * 86400000).toISOString();
@@ -33,5 +33,20 @@ describe('formatPostedDate', () => {
 
   it('labels multiple weeks old in weeks', () => {
     expect(formatPostedDate(daysAgo(20))).toBe('Posted 2 weeks ago');
+  });
+});
+
+describe('formatRelativeDate', () => {
+  it('returns null for a missing or unparseable date', () => {
+    expect(formatRelativeDate(null)).toBeNull();
+    expect(formatRelativeDate('not-a-date')).toBeNull();
+  });
+
+  it('labels today, days, and weeks without a prefix', () => {
+    expect(formatRelativeDate(daysAgo(0))).toBe('Today');
+    expect(formatRelativeDate(daysAgo(1))).toBe('1d ago');
+    expect(formatRelativeDate(daysAgo(6))).toBe('6d ago');
+    expect(formatRelativeDate(daysAgo(7))).toBe('1 week ago');
+    expect(formatRelativeDate(daysAgo(14))).toBe('2 weeks ago');
   });
 });
