@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { validateRequest, MESSAGE_MAX_LENGTH } = require('../utils/requestValidation');
+const { validateRequest, validateRequestDecision, MESSAGE_MAX_LENGTH } = require('../utils/requestValidation');
 
 const listingId = '3ba790b3-4f4f-4f09-bc4e-c06c6e01d30e';
 
@@ -51,4 +51,19 @@ test('rejects a non-string message', () => {
 test('reports listing_id and message errors together', () => {
   const { errors } = validateRequest({ listing_id: 'nope', message: 12 });
   assert.deepEqual(Object.keys(errors).sort(), ['listing_id', 'message']);
+});
+
+test('accepts accepted and declined as decisions', () => {
+  for (const status of ['accepted', 'declined']) {
+    const { errors, values } = validateRequestDecision({ status });
+    assert.deepEqual(errors, {});
+    assert.deepEqual(values, { status });
+  }
+});
+
+test('rejects a missing body, missing status, pending, unknown or non-string status', () => {
+  for (const body of [undefined, {}, { status: 'pending' }, { status: 'maybe' }, { status: 1 }, { status: null }]) {
+    const { errors } = validateRequestDecision(body);
+    assert.ok(errors.status, `expected an error for ${JSON.stringify(body)}`);
+  }
 });

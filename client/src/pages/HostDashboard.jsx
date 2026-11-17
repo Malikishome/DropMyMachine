@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import ListingFormModal from '../components/ListingFormModal.jsx';
+import PendingRequestsPanel from '../components/PendingRequestsPanel.jsx';
+import { countByStatus } from '../requestStatus.js';
 
 function StatCard({ label, value, caption }) {
   return (
@@ -25,11 +27,18 @@ function HostDashboard({
   onMyListingsRetry,
   onCreateListing,
   onUpdateListing,
+  requests,
+  requestsLoading,
+  requestsError,
+  onRequestsRetry,
+  onRespondToRequest,
 }) {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingListing, setEditingListing] = useState(null);
   const [togglingId, setTogglingId] = useState(null);
   const [actionError, setActionError] = useState(null);
+  const counts = requests ? countByStatus(requests) : null;
+  const requestTotal = requests ? requests.length : null;
   const firstName = profile?.full_name?.split(' ')[0] || 'there';
   const activeCount = myListings
     ? myListings.filter((listing) => listing.status === 'active').length
@@ -70,18 +79,18 @@ function HostDashboard({
         </button>
       </div>
 
-      <div className="rounded-card border border-border bg-surface p-6 mt-6">
-        <h2 className="text-sm font-bold text-text mb-1">Pending requests</h2>
-        <p className="text-sm text-muted">
-          No operators are waiting for a response yet. When someone sends a
-          placement request, you&apos;ll see it here.
-        </p>
-      </div>
+      <PendingRequestsPanel
+        requests={requests}
+        loading={requestsLoading}
+        error={requestsError}
+        onRetry={onRequestsRetry}
+        onRespond={onRespondToRequest}
+      />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
         <StatCard label="Views" value="—" caption="Last 30 days" />
-        <StatCard label="Requests" value="—" caption="Coming soon" />
-        <StatCard label="Accepted" value="—" caption="Coming soon" />
+        <StatCard label="Requests" value={requestTotal ?? '—'} caption="All time" />
+        <StatCard label="Accepted" value={counts?.accepted ?? '—'} caption="All time" />
         <StatCard
           label="Trust level"
           value={`${profile?.trust_level ?? 1} of 4`}

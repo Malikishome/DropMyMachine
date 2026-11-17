@@ -7,7 +7,7 @@ function validateRequest(body = {}) {
   const errors = {};
   const values = {};
 
-  if (typeof body.listing_id !== 'string' || !UUID_PATTERN.test(body.listing_id)) {
+  if (!isUuid(body.listing_id)) {
     errors.listing_id = 'listing_id must be a valid listing id';
   } else {
     values.listing_id = body.listing_id;
@@ -27,4 +27,22 @@ function validateRequest(body = {}) {
   return { errors, values };
 }
 
-module.exports = { validateRequest, MESSAGE_MAX_LENGTH };
+// Body for PUT /api/requests/:id. 'pending' is not a valid decision: hosts cannot reopen a request.
+function validateRequestDecision(body = {}) {
+  const errors = {};
+  const values = {};
+
+  if (body.status === 'accepted' || body.status === 'declined') {
+    values.status = body.status;
+  } else {
+    errors.status = "status must be 'accepted' or 'declined'";
+  }
+
+  return { errors, values };
+}
+
+function isUuid(value) {
+  return typeof value === 'string' && UUID_PATTERN.test(value);
+}
+
+module.exports = { validateRequest, validateRequestDecision, isUuid, MESSAGE_MAX_LENGTH };

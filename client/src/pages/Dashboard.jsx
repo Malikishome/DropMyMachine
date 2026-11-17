@@ -162,7 +162,7 @@ function Dashboard() {
   }, [session]);
 
   useEffect(() => {
-    if (profile?.role !== 'operator') return undefined;
+    if (!profile) return undefined;
     const controller = new AbortController();
     // fetchMyRequests only sets state after an await, but the lint rule can't see that.
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -200,6 +200,27 @@ function Dashboard() {
     }
     setRequestingListing(null);
     await fetchMyRequests();
+  };
+
+  const handleRespondToRequest = async (id, status) => {
+    let res;
+    try {
+      res = await fetch(`${API_URL}/api/requests/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({ status }),
+      });
+    } catch (err) {
+      console.error(err);
+      throw new Error("Couldn't reach the server. Please try again.", { cause: err });
+    }
+    const data = await res.json().catch(() => ({}));
+    // Refetch even on failure: a 409 means the row on screen is stale.
+    await Promise.all([fetchMyRequests(), status === 'accepted' ? fetchMyListings() : null]);
+    if (!res.ok) throw new Error(data.message || "Couldn't update the request");
   };
 
   const handleLogout = () => {
@@ -255,6 +276,7 @@ function Dashboard() {
           myRequestsError,
           onMyRequestsRetry: handleMyRequestsRetry,
           onSendRequest: setRequestingListing,
+          onRespondToRequest: handleRespondToRequest,
         }}
       />
       {requestingListing && (

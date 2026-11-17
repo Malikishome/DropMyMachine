@@ -10,6 +10,7 @@ function DashboardHome() {
     myRequestsError,
     onMyRequestsRetry,
     onSendRequest,
+    onRespondToRequest,
     ...hostProps
   } = useOutletContext();
 
@@ -26,7 +27,17 @@ function DashboardHome() {
     );
   }
 
-  return <HostDashboard profile={profile} {...hostProps} />;
+  return (
+    <HostDashboard
+      profile={profile}
+      requests={myRequests}
+      requestsLoading={myRequestsLoading}
+      requestsError={myRequestsError}
+      onRequestsRetry={onMyRequestsRetry}
+      onRespondToRequest={onRespondToRequest}
+      {...hostProps}
+    />
+  );
 }
 
 export default DashboardHome;

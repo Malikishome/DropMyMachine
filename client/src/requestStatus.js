@@ -26,3 +26,13 @@ export function requestsByListing(requests = []) {
   }
   return map;
 }
+
+export function pendingRequests(requests = []) {
+  return requests.filter((request) => request?.status === 'pending');
+}
+
+export function operatorInitials(name) {
+  const words = typeof name === 'string' ? name.trim().split(/\s+/).filter(Boolean) : [];
+  if (words.length === 0) return '?';
+  return words.slice(0, 2).map((word) => word[0].toUpperCase()).join('');
+}

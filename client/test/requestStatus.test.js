@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { countByStatus, requestStatusBadge, requestsByListing } from '../src/requestStatus.js';
+import {
+  countByStatus,
+  operatorInitials,
+  pendingRequests,
+  requestStatusBadge,
+  requestsByListing,
+} from '../src/requestStatus.js';
 
 describe('requestStatusBadge', () => {
   it('maps each known status to a label and class', () => {
@@ -45,5 +51,40 @@ describe('requestsByListing', () => {
 
   it('skips entries without a listing_id', () => {
     expect(requestsByListing([{ id: 'r1' }, null]).size).toBe(0);
+  });
+});
+
+describe('pendingRequests', () => {
+  it('returns an empty list for no input or no pending requests', () => {
+    expect(pendingRequests()).toEqual([]);
+    expect(pendingRequests([{ id: 'a', status: 'declined' }])).toEqual([]);
+  });
+
+  it('keeps only pending requests, in input order', () => {
+    const requests = [
+      { id: 'a', status: 'pending' },
+      { id: 'b', status: 'accepted' },
+      { id: 'c', status: 'pending' },
+      { id: 'd', status: 'declined' },
+    ];
+    expect(pendingRequests(requests).map((request) => request.id)).toEqual(['a', 'c']);
+  });
+});
+
+describe('operatorInitials', () => {
+  it('uses the first letters of the first two words, uppercased', () => {
+    expect(operatorInitials('marcus')).toBe('M');
+    expect(operatorInitials('marcus reed')).toBe('MR');
+    expect(operatorInitials('sunrise kiosks llc')).toBe('SK');
+  });
+
+  it('ignores padding and extra spaces', () => {
+    expect(operatorInitials('  marcus   reed  ')).toBe('MR');
+  });
+
+  it('falls back to ? for missing or blank names', () => {
+    expect(operatorInitials(null)).toBe('?');
+    expect(operatorInitials(undefined)).toBe('?');
+    expect(operatorInitials('   ')).toBe('?');
   });
 });
